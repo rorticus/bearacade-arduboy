@@ -20,8 +20,8 @@ Arduboy2 arduboy;
 #define DRAW_DISTANCE 50
 #define MAX_SEGMENTS 128
 
-unsigned char solid_pattern[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-unsigned char checkered_pattern[] = {
+const unsigned char solid_pattern[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+const unsigned char checkered_pattern[] = {
   0b10101010,
   0b01010101,
   0b10101010,
@@ -31,7 +31,7 @@ unsigned char checkered_pattern[] = {
   0b10101010,
   0b01010101,
 };
-unsigned char v_stripes_pattern[] = {
+const unsigned char v_stripes_pattern[] = {
   0b11111111,
   0b00000000,
   0b11111111,
@@ -43,27 +43,68 @@ unsigned char v_stripes_pattern[] = {
 };
 
 typedef struct _segment {
-  int curve;
-  int y;
-  int z;
+  char curve;
+  unsigned char index;
 } segment;
 
 segment segments[MAX_SEGMENTS];
-unsigned char segmentStart = 0;
-unsigned char segmentEnd = MAX_SEGMENTS - 1;
+unsigned char segmentHead = 0;
+unsigned char segmentTail = 0;
 
-int roadW = 2300;
+int roadW = 2800;
 int segL = 256;
 float camD = 0.84;
 int height;
 int width;
-int cameraZ = 1;
 int cameraX = 0;
+unsigned char lastIndex = 0;
+
+void add_segment(char curve) {
+  segments[segmentTail].curve = curve;
+  segments[segmentTail].index = lastIndex;
+  
+  lastIndex = (lastIndex + 1) % 20;
+  segmentTail = (segmentTail + 1) % MAX_SEGMENTS;
+
+  if(segmentTail == segmentHead) {
+    segmentHead = (segmentHead + 1) % MAX_SEGMENTS;
+  }
+}
+
+void add_road(unsigned char enter, unsigned char hold, unsigned char leave, char curve) {
+  for(unsigned char n = 0; n < enter; n++) {
+    add_segment(0);
+  }
+
+  for(unsigned char n = 0; n < hold; n++) {
+    add_segment(curve);
+  }
+
+  for(unsigned char n = 0; n < leave; n++) {
+    add_segment(0);
+  }
+}
+
+unsigned char track_length() {
+  /* H--T
+   * 0123456789
+   */
+  if(segmentHead < segmentTail) {
+    return segmentTail - segmentHead;
+  }
+
+  /* -T     H--
+   * 0123456789
+   */
+  return MAX_SEGMENTS - segmentHead + segmentTail;
+}
 
 void reset_road() {
-  for (int i = 0; i < MAX_SEGMENTS; i++) {
-    segments[i].z = i * segL;
-    segments[i].curve = 4;
+  add_segment(0);
+  add_segment(0);
+  
+  while(track_length() < MAX_SEGMENTS - 1) {
+    add_segment(0);
   }
 }
 
@@ -79,17 +120,15 @@ void project(
   *W = scale * roadW * width / 2;
 }
 
-void draw_segment(int x1, int y1, int w1, int x2, int y2, int w2, int z) {
+void draw_segment(int x1, int y1, int w1, int x2, int y2, int w2, unsigned char index) {
 
   float Wd = (float)((w2 - w1) / 2) / (float)(y1 - y2);
   float Xd = (float)(x2 - x1) / (float)(y1 - y2);
 
   float x = x1;
   float w = w1 / 2;
-  
-  int index = z >> 8;
 
-  char drawLanes = index % 8 < 4;
+  char drawLanes = index % 10 < 4;
 
   char *grassPattern = index % 20 < 10 ? solid_pattern : checkered_pattern;
 
@@ -117,12 +156,6 @@ void draw_segment(int x1, int y1, int w1, int x2, int y2, int w2, int z) {
     x += Xd;
     w += Wd;
   }
-  
-
-//   arduboy.drawLine(x1 - w1 / 2, y1, x1 + w1 / 2, y1);
-//   arduboy.drawLine(x1 + w1 / 2, y1, x2 + w2 / 2, y2);
-//   arduboy.drawLine(x2 + w2 / 2, y2, x2 - w2 / 2, y2);
-//   arduboy.drawLine(x2 - w2 / 2, y2, x1 - w1 / 2, y1);
 }
 
 void draw_patterned_hline(int x, int y, int w, unsigned char *pattern) {
@@ -143,60 +176,36 @@ void draw_patterned_hline(int x, int y, int w, unsigned char *pattern) {
 
 void render_road() {
   int lastX, lastY, lastW;
-  int baseSegment = cameraZ / segL;
+  int baseSegment = segmentHead;
 
   float baseX = 0, dx = 0;
+  int z = 0;
 
   for(int i = 0; i < DRAW_DISTANCE; i++) {
-    segment *seg = &segments[(baseSegment + i) % MAX_SEGMENTS];
+    unsigned char segmentIndex = (baseSegment + i) % MAX_SEGMENTS;
+
+    if(segmentIndex == segmentTail) {
+      break;
+    }
+    
+    segment *seg = &segments[segmentIndex];
 
     int x = 0, y = 0, w = 0;
-    project(0, 0, seg->z, (float)cameraX - baseX, 1500, cameraZ, &x, &y, &w);
-//
-//    if(x < 0 || y < 0) {
-//      char str[64];
-//      sprintf(str, "%d, %d, %d", cameraX, x, y);
-//      arduboy.println(str);
-//      return;
-//    }
+    project(0, 0, z, (float)cameraX - baseX, 1500, 0, &x, &y, &w);
 
     baseX += dx;
     dx += seg->curve;
     
     if(i > 1) {
-      draw_segment(lastX, lastY, lastW, x, y, w, seg->z);
+      draw_segment(lastX, lastY, lastW, x, y, w, seg->index);
     }
 
     lastX = x;
     lastY = y;
     lastW = w;
+    z += segL;
   }
 }
-
-void generate_more_track() {
-  char toGenerate = 0;
-  while(segmentStart != segmentEnd) {
-    if(segments[segmentStart].z < cameraZ) {
-      segmentStart = (segmentStart + 1) % MAX_SEGMENTS;
-      
-      toGenerate++;
-    } else {
-      break;
-    }
-  }
-
-  int lastZ = segments[segmentEnd].z;
-  
-  while(toGenerate > 0) {
-    segmentEnd = (segmentEnd + 1) % MAX_SEGMENTS;
-    segments[segmentEnd].z = lastZ + segL;
-    segments[segmentEnd].curve = 0;
-    
-    lastZ += segL;
-    toGenerate--;
-  }
-}
-
 
 // This function runs once in your game.
 // use it for anything that needs to be set only once in your game.
@@ -227,20 +236,19 @@ void loop() {
   arduboy.clear();
 
   // render the background
-  arduboy.drawRect(0, 0, width, height);
 
   // render the road
    render_road();
+
+   while(track_length() < MAX_SEGMENTS - 10) {
+    add_road(0, 10, 0, 4);
+   }
 
   // then we finaly we tell the arduboy to display what we just wrote to the display
   arduboy.display();
 
   if(arduboy.pressed(UP_BUTTON)) {
-    cameraZ += segL;
-  }
-
-  if(arduboy.pressed(DOWN_BUTTON)) {
-    cameraZ -= segL;
+    segmentHead = (segmentHead + 1) % MAX_SEGMENTS;
   }
 
   if(arduboy.pressed(LEFT_BUTTON)) {
@@ -249,6 +257,4 @@ void loop() {
   if(arduboy.pressed(RIGHT_BUTTON)) {
     cameraX += 200;
   }
-
-  generate_more_track();
 }
