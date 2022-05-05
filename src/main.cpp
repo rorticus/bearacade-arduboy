@@ -13,21 +13,12 @@ version 2.1 of the License, or (at your option) any later version.
 
 #include <Arduboy2.h>
 #include "drawing.h"
+#include "track.h"
 
 // make an instance of arduboy used for many functions
 Arduboy2 arduboy;
 
 #define DRAW_DISTANCE 50
-#define MAX_SEGMENTS 128
-
-typedef struct _segment {
-  char curve;
-  unsigned char index;
-} segment;
-
-segment segments[MAX_SEGMENTS];
-unsigned char segmentHead = 0;
-unsigned char segmentTail = 0;
 
 int roadW = 2800;
 int segL = 256;
@@ -35,47 +26,6 @@ float camD = 0.84;
 int height;
 int width;
 int cameraX = 0;
-unsigned char lastIndex = 0;
-
-void add_segment(char curve) {
-  segments[segmentTail].curve = curve;
-  segments[segmentTail].index = lastIndex;
-  
-  lastIndex = (lastIndex + 1) % 20;
-  segmentTail = (segmentTail + 1) % MAX_SEGMENTS;
-
-  if(segmentTail == segmentHead) {
-    segmentHead = (segmentHead + 1) % MAX_SEGMENTS;
-  }
-}
-
-void add_road(unsigned char enter, unsigned char hold, unsigned char leave, char curve) {
-  for(unsigned char n = 0; n < enter; n++) {
-    add_segment(0);
-  }
-
-  for(unsigned char n = 0; n < hold; n++) {
-    add_segment(curve);
-  }
-
-  for(unsigned char n = 0; n < leave; n++) {
-    add_segment(0);
-  }
-}
-
-unsigned char track_length() {
-  /* H--T
-   * 0123456789
-   */
-  if(segmentHead < segmentTail) {
-    return segmentTail - segmentHead;
-  }
-
-  /* -T     H--
-   * 0123456789
-   */
-  return MAX_SEGMENTS - segmentHead + segmentTail;
-}
 
 void reset_road() {
   add_segment(0);
@@ -100,19 +50,12 @@ void project(
 
 void render_road() {
   int lastX, lastY, lastW;
-  int baseSegment = segmentHead;
 
   float baseX = 0, dx = 0;
   int z = 0;
 
   for(int i = 0; i < DRAW_DISTANCE; i++) {
-    unsigned char segmentIndex = (baseSegment + i) % MAX_SEGMENTS;
-
-    if(segmentIndex == segmentTail) {
-      break;
-    }
-    
-    segment *seg = &segments[segmentIndex];
+    segment *seg = get_segment(i);
 
     int x = 0, y = 0, w = 0;
     project(0, 0, z, (float)cameraX - baseX, 1500, 0, &x, &y, &w);
@@ -172,7 +115,7 @@ void loop() {
   arduboy.display();
 
   if(arduboy.pressed(UP_BUTTON)) {
-    segmentHead = (segmentHead + 1) % MAX_SEGMENTS;
+    advance_track(1);
   }
 
   if(arduboy.pressed(LEFT_BUTTON)) {
