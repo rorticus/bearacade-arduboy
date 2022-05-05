@@ -42,3 +42,40 @@ void draw_patterned_hline(int x, int y, int w, const unsigned char *pattern) {
     }
   }
 }
+
+void draw_segment(int x1, int y1, int w1, int x2, int y2, int w2, unsigned char index) {
+
+  float Wd = (float)((w2 - w1) / 2) / (float)(y1 - y2);
+  float Xd = (float)(x2 - x1) / (float)(y1 - y2);
+
+  float x = x1;
+  float w = w1 / 2;
+
+  char drawLanes = index % 10 < 4;
+
+  const unsigned char *grassPattern = (index % 20) < 10 ? solid_pattern : checkered_pattern;
+  
+  for(int y = y1; y >= y2; y--) {
+
+    int rumbleWidth = (float)w * 0.15;
+    int lineWidth = rumbleWidth;
+    int rumbleLeft = x - w - rumbleWidth;
+    int rumbleRight = x + w;
+
+    // rumble strips
+    draw_patterned_hline(rumbleLeft, y, rumbleWidth, solid_pattern);
+    draw_patterned_hline(rumbleRight, y, rumbleWidth, solid_pattern);
+
+    // grass
+    draw_patterned_hline(0, y, x - w, grassPattern);
+    draw_patterned_hline(x + w, y, width - x - w, grassPattern);
+
+    // lane markers
+    if(drawLanes) {
+      draw_patterned_hline(x - lineWidth / 2, y, lineWidth, solid_pattern);
+    }
+    
+    x += Xd;
+    w += Wd;
+  }
+}
