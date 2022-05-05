@@ -11,36 +11,14 @@ License as published by the Free Software Foundation; either
 version 2.1 of the License, or (at your option) any later version.
 */
 
-#include <Arduino.h>
 #include <Arduboy2.h>
+#include "drawing.h"
 
 // make an instance of arduboy used for many functions
 Arduboy2 arduboy;
 
 #define DRAW_DISTANCE 50
 #define MAX_SEGMENTS 128
-
-const unsigned char solid_pattern[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-const unsigned char checkered_pattern[] = {
-  0b10101010,
-  0b01010101,
-  0b10101010,
-  0b01010101,
-  0b10101010,
-  0b01010101,
-  0b10101010,
-  0b01010101,
-};
-const unsigned char v_stripes_pattern[] = {
-  0b11111111,
-  0b00000000,
-  0b11111111,
-  0b00000000,
-  0b11111111,
-  0b00000000,
-  0b11111111,
-  0b00000000,
-};
 
 typedef struct _segment {
   char curve;
@@ -120,22 +98,6 @@ void project(
   *W = scale * roadW * width / 2;
 }
 
-void draw_patterned_hline(int x, int y, int w, unsigned char *pattern) {
-  unsigned char p = pattern[y & 7];
-
-  if(y < 0 || y >= height || w <= 0) {
-    return;
-  }
-
-  for(unsigned char i = max(0, x); i < x + w && i < width; i++) {
-    unsigned char m = 1 << (i & 7);
-
-    if(p & m) {
-      arduboy.drawPixel(i, y);
-    }
-  }
-}
-
 void draw_segment(int x1, int y1, int w1, int x2, int y2, int w2, unsigned char index) {
 
   float Wd = (float)((w2 - w1) / 2) / (float)(y1 - y2);
@@ -146,7 +108,7 @@ void draw_segment(int x1, int y1, int w1, int x2, int y2, int w2, unsigned char 
 
   char drawLanes = index % 10 < 4;
 
-  char *grassPattern = (index % 20) < 10 ? solid_pattern : checkered_pattern;
+  const unsigned char *grassPattern = (index % 20) < 10 ? solid_pattern : checkered_pattern;
   
   for(int y = y1; y >= y2; y--) {
 
