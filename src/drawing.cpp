@@ -51,16 +51,17 @@ void draw_segment(int x1, int y1, int w1, int x2, int y2, int w2, unsigned char 
   float x = x1;
   float w = w1 / 2;
 
-  char drawLanes = index % 10 < 4;
+  char drawLanes = index % 10 < 3;
 
   const unsigned char *grassPattern = (index % 20) < 10 ? solid_pattern : checkered_pattern;
   
   for(int y = y1; y >= y2; y--) {
 
-    int rumbleWidth = (float)w * 0.15;
-    int lineWidth = rumbleWidth;
+    int rumbleWidth = (float)w * 0.15; // 1 / 6
+    int lineWidth = (float)w * 0.1; // 1 / 24
     int rumbleLeft = x - w - rumbleWidth;
     int rumbleRight = x + w;
+    int laneOffset = w * 0.33;
 
     // rumble strips
     draw_patterned_hline(rumbleLeft, y, rumbleWidth, solid_pattern);
@@ -72,7 +73,8 @@ void draw_segment(int x1, int y1, int w1, int x2, int y2, int w2, unsigned char 
 
     // lane markers
     if(drawLanes) {
-      draw_patterned_hline(x - lineWidth / 2, y, lineWidth, solid_pattern);
+      draw_patterned_hline(x - laneOffset - lineWidth / 2, y, lineWidth, solid_pattern);
+      draw_patterned_hline(x + laneOffset - lineWidth / 2, y, lineWidth, solid_pattern);
     }
     
     x += Xd;

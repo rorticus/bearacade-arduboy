@@ -27,15 +27,6 @@ int height;
 int width;
 int cameraX = 0;
 
-void reset_road() {
-  add_segment(0);
-  add_segment(0);
-  
-  while(track_length() < MAX_SEGMENTS - 1) {
-    add_segment(0);
-  }
-}
-
 void project(
   float x, float y, float z,
   int camX, int camY, int camZ,
@@ -106,6 +97,9 @@ void loop() {
 
   // render the road
    render_road();
+
+   // render the player
+   arduboy.fillRect(width / 2 - 8, height - 2 - 12, 16, 12);
 
    add_next_track();
 

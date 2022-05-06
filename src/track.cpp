@@ -88,3 +88,11 @@ void add_next_track() {
       break;
   }
 }
+
+void reset_road() {
+  add_road(0, 16, 0, 0);
+  
+  while(track_length() < MAX_SEGMENTS - 33) {
+    add_next_track();
+  }
+}

@@ -14,5 +14,6 @@ void add_road(unsigned char enter, unsigned char hold, unsigned char leave, char
 segment *get_segment(unsigned char index);
 void advance_track(unsigned char count);
 void add_next_track();
+void reset_road();
 
 #endif
