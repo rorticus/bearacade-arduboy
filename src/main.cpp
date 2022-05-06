@@ -107,9 +107,7 @@ void loop() {
   // render the road
    render_road();
 
-   while(track_length() < MAX_SEGMENTS - 10) {
-    add_road(0, 10, 0, 4);
-   }
+   add_next_track();
 
   // then we finaly we tell the arduboy to display what we just wrote to the display
   arduboy.display();
