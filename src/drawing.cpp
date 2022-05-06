@@ -53,7 +53,7 @@ void draw_segment(int x1, int y1, int w1, int x2, int y2, int w2, unsigned char 
 
   char drawLanes = index % 10 < 3;
 
-  const unsigned char *grassPattern = (index % 20) < 10 ? solid_pattern : checkered_pattern;
+  const unsigned char *grassPattern = (index % 10) < 5 ? solid_pattern : checkered_pattern;
   
   for(int y = y1; y >= y2; y--) {
 

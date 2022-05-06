@@ -15,6 +15,42 @@ version 2.1 of the License, or (at your option) any later version.
 #include "drawing.h"
 #include "track.h"
 
+// 16x14
+const uint8_t PROGMEM player[] = {
+    0x30,
+    0xfe,
+    0x0a,
+    0xaa,
+    0xaa,
+    0xaa,
+    0xaa,
+    0xaa,
+    0xaa,
+    0xaa,
+    0xaa,
+    0xaa,
+    0xaa,
+    0x0a,
+    0xfe,
+    0x30,
+    0x00,
+    0x3f,
+    0x3a,
+    0x3a,
+    0x0a,
+    0x0a,
+    0x0f,
+    0x0d,
+    0x0d,
+    0x0f,
+    0x0a,
+    0x0a,
+    0x3a,
+    0x3a,
+    0x3f,
+    0x00,
+};
+
 // make an instance of arduboy used for many functions
 Arduboy2 arduboy;
 
@@ -28,24 +64,26 @@ int width;
 int cameraX = 0;
 
 void project(
-  float x, float y, float z,
-  int camX, int camY, int camZ,
-  int *X, int *Y, int *W
-) {
+    float x, float y, float z,
+    int camX, int camY, int camZ,
+    int *X, int *Y, int *W)
+{
   float scale = camD / (z - camZ);
-  
-  *X = (1 + scale*(x - camX)) * width / 2;
-  *Y = (1 - scale*(y - camY)) * height / 2;
+
+  *X = (1 + scale * (x - camX)) * width / 2;
+  *Y = (1 - scale * (y - camY)) * height / 2;
   *W = scale * roadW * width / 2;
 }
 
-void render_road() {
+void render_road()
+{
   int lastX, lastY, lastW;
 
   float baseX = 0, dx = 0;
   int z = 0;
 
-  for(int i = 0; i < DRAW_DISTANCE; i++) {
+  for (int i = 0; i < DRAW_DISTANCE; i++)
+  {
     segment *seg = get_segment(i);
 
     int x = 0, y = 0, w = 0;
@@ -53,8 +91,9 @@ void render_road() {
 
     baseX += dx;
     dx += seg->curve;
-    
-    if(i > 1) {
+
+    if (i > 1)
+    {
       draw_segment(lastX, lastY, lastW, x, y, w, seg->index);
     }
 
@@ -67,7 +106,8 @@ void render_road() {
 
 // This function runs once in your game.
 // use it for anything that needs to be set only once in your game.
-void setup() {
+void setup()
+{
   // initiate arduboy instance
   arduboy.begin();
   width = arduboy.width();
@@ -80,10 +120,10 @@ void setup() {
   reset_road();
 }
 
-
 // our main game loop, this runs once every cycle/frame.
 // this is where our game logic goes.
-void loop() {
+void loop()
+{
   // pause render until it's time for the next frame
   if (!(arduboy.nextFrame()))
     return;
@@ -96,24 +136,26 @@ void loop() {
   // render the background
 
   // render the road
-   render_road();
+  render_road();
 
-   // render the player
-   arduboy.fillRect(width / 2 - 8, height - 2 - 12, 16, 12);
+  // render the player
+  //  arduboy.fillRect(width / 2 - 8, height - 2 - 12, 16, 12);
+  arduboy.fillRect(width / 2 - 8, height - 2 - 14, 16, 14, 0);
+  arduboy.drawBitmap(width / 2 - 8, height - 2 - 14, player, 16, 14);
 
-   add_next_track();
+  add_next_track();
 
   // then we finaly we tell the arduboy to display what we just wrote to the display
   arduboy.display();
 
-  if(arduboy.pressed(UP_BUTTON)) {
-    advance_track(1);
-  }
+  advance_track(1);
 
-  if(arduboy.pressed(LEFT_BUTTON)) {
+  if (arduboy.pressed(LEFT_BUTTON))
+  {
     cameraX -= 200;
   }
-  if(arduboy.pressed(RIGHT_BUTTON)) {
+  if (arduboy.pressed(RIGHT_BUTTON))
+  {
     cameraX += 200;
   }
 }
