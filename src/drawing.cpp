@@ -27,6 +27,17 @@ extern const unsigned char v_stripes_pattern[] = {
   0b00000000,
 };
 
+const unsigned char diag_stripes_pattern[] = {
+  0b11011011,
+  0b10110110,
+  0b01101101,
+  0b11011011,
+  0b10110110,
+  0b01101101,
+  0b11011011,
+  0b10110110,
+};
+
 void draw_patterned_hline(int x, int y, int w, const unsigned char *pattern) {
   unsigned char p = pattern[y & 7];
 
