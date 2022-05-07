@@ -62,6 +62,7 @@ float camD = 0.84;
 int height;
 int width;
 int cameraX = 0;
+int targetLane = 1;
 
 void project(
     float x, float y, float z,
@@ -150,12 +151,31 @@ void loop()
 
   advance_track(1);
 
-  if (arduboy.pressed(LEFT_BUTTON))
+  int targetX = (targetLane - 1) * 1000;
+
+  if (targetX < cameraX)
   {
     cameraX -= 200;
   }
-  if (arduboy.pressed(RIGHT_BUTTON))
+  else if (targetX > cameraX)
   {
     cameraX += 200;
+  }
+  else
+  {
+    if (arduboy.pressed(LEFT_BUTTON))
+    {
+      if (targetLane > 0)
+      {
+        targetLane--;
+      }
+    }
+    if (arduboy.pressed(RIGHT_BUTTON))
+    {
+      if (targetLane < 2)
+      {
+        targetLane++;
+      }
+    }
   }
 }
