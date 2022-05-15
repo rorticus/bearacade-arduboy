@@ -67,13 +67,15 @@ int targetLane = 1;
 void project(
     float x, float y, float z,
     int camX, int camY, int camZ,
-    int *X, int *Y, int *W)
+    int *X, int *Y, int *W,
+    float *S)
 {
   float scale = camD / (z - camZ);
 
   *X = (1 + scale * (x - camX)) * width / 2;
   *Y = (1 - scale * (y - camY)) * height / 2;
   *W = scale * roadW * width / 2;
+  *S = scale;
 }
 
 void render_road()
@@ -88,7 +90,12 @@ void render_road()
     segment *seg = get_segment(i);
 
     int x = 0, y = 0, w = 0;
-    project(0, 0, z, (float)cameraX - baseX, 1500, 0, &x, &y, &w);
+    float scale = 0;
+    project(0, 0, z, (float)cameraX - baseX, 1500, 0, &x, &y, &w, &scale);
+
+    seg->x = x;
+    seg->y = y;
+    seg->scale = scale;
 
     baseX += dx;
     dx += seg->curve;
@@ -102,6 +109,55 @@ void render_road()
     lastY = y;
     lastW = w;
     z += segL;
+  }
+
+  for (int i = DRAW_DISTANCE - 1; i > 10; i--)
+  {
+    segment *seg = get_segment(i);
+
+    if (seg->sprite)
+    {
+      unsigned char leftSprite = seg->sprite >> 4;
+      unsigned char rightSprite = seg->sprite & 0xF;
+
+      if (leftSprite != SPRITE_NONE)
+      {
+        int spriteX =
+            seg->x -
+            (seg->scale *
+             roadW *
+             width * 1.25) /
+                2;
+
+        draw_sprite(
+            width,
+            height,
+            roadW,
+            seg->sprite,
+            seg->scale,
+            spriteX,
+            seg->y);
+      }
+
+            if (rightSprite != SPRITE_NONE)
+      {
+        int spriteX =
+            seg->x +
+            (seg->scale *
+             roadW *
+             width * 1.25) /
+                2;
+
+        draw_sprite(
+            width,
+            height,
+            roadW,
+            seg->sprite,
+            seg->scale,
+            spriteX,
+            seg->y);
+      }
+    }
   }
 }
 

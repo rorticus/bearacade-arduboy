@@ -3,9 +3,18 @@
 
 #define MAX_SEGMENTS 128
 
+#define SPRITE_NONE 0
+#define SPRITE_TREE 1
+#define SPRITE_ROCK 2
+#define SPRITE_MAX  3
+
 typedef struct _segment {
   char curve;
   unsigned char index;
+  unsigned char sprite;
+  unsigned char x;
+  unsigned char y;
+  float scale;
 } segment;
 
 unsigned char track_length();

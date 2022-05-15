@@ -7,54 +7,111 @@ extern int width;
 
 extern const unsigned char solid_pattern[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 extern const unsigned char checkered_pattern[] = {
-  0b10101010,
-  0b01010101,
-  0b10101010,
-  0b01010101,
-  0b10101010,
-  0b01010101,
-  0b10101010,
-  0b01010101,
+    0b10101010,
+    0b01010101,
+    0b10101010,
+    0b01010101,
+    0b10101010,
+    0b01010101,
+    0b10101010,
+    0b01010101,
 };
-extern const unsigned char v_stripes_pattern[] = {
-  0b11111111,
+
+unsigned char almost_solid_pattern[] = {
+  0b10101010,
+  0b11011101,
+  0b10101010,
+  0b01110111,
+  0b10101010,
+  0b11011101,
+  0b10101010,
+  0b01110111,
+};
+
+unsigned char star_pattern[] = {
+  0b10101010,
+  0b01000100,
+  0b10101010,
+  0b01000100,
+  0b10101010,
+  0b01000100,
+  0b10101010,
+  0b01000100,
+};
+
+unsigned char sparse_pattern[] = {
+  0b00100010,
   0b00000000,
-  0b11111111,
+  0b10001000,
   0b00000000,
-  0b11111111,
+  0b00100010,
   0b00000000,
-  0b11111111,
+  0b10001000,
   0b00000000,
 };
 
-const unsigned char diag_stripes_pattern[] = {
-  0b11011011,
-  0b10110110,
-  0b01101101,
-  0b11011011,
-  0b10110110,
-  0b01101101,
-  0b11011011,
-  0b10110110,
+const uint8_t PROGMEM treeSmall[] = {
+    8,
+    16,
+    0x00,
+    0x40,
+    0xc0,
+    0xb0,
+    0xf0,
+    0xe0,
+    0xc0,
+    0x00,
+    0x00,
+    0x01,
+    0x05,
+    0x03,
+    0x0b,
+    0x03,
+    0x04,
+    0x01,
 };
 
-void draw_patterned_hline(int x, int y, int w, const unsigned char *pattern) {
+const uint8_t PROGMEM treeSmallMask[] = {
+    0x80,
+    0xe0,
+    0xf0,
+    0xf0,
+    0xf0,
+    0xf0,
+    0xe0,
+    0xc0,
+    0x07,
+    0x8f,
+    0xdf,
+    0xff,
+    0xff,
+    0xff,
+    0xdf,
+    0x0f,
+};
+
+void draw_patterned_hline(int x, int y, int w, const unsigned char *pattern)
+{
   unsigned char p = pattern[y & 7];
 
-  if(y < 0 || y >= height || w <= 0) {
+  if (y < 0 || y >= height || w <= 0)
+  {
     return;
   }
 
-  for(unsigned char i = max(0, x); i < x + w && i < width; i++) {
+  for (unsigned char i = max(0, x); i < x + w && i < width; i++)
+  {
     unsigned char m = 1 << (i & 7);
 
-    if(p & m) {
+    if (p & m)
+    {
       arduboy.drawPixel(i, y);
     }
   }
 }
 
-void draw_segment(int x1, int y1, int w1, int x2, int y2, int w2, unsigned char index) {
+void draw_segment(int x1, int y1, int w1, int x2, int y2, int w2, unsigned char index)
+{
 
   float Wd = (float)((w2 - w1) / 2) / (float)(y1 - y2);
   float Xd = (float)(x2 - x1) / (float)(y1 - y2);
@@ -64,12 +121,13 @@ void draw_segment(int x1, int y1, int w1, int x2, int y2, int w2, unsigned char 
 
   char drawLanes = index % 10 < 3;
 
-  const unsigned char *grassPattern = (index % 10) < 5 ? solid_pattern : checkered_pattern;
-  
-  for(int y = y1; y >= y2; y--) {
+  const unsigned char *grassPattern = (index % 10) < 5 ? checkered_pattern : almost_solid_pattern;
+
+  for (int y = y1; y >= y2; y--)
+  {
 
     int rumbleWidth = (float)w * 0.15; // 1 / 6
-    int lineWidth = (float)w * 0.1; // 1 / 24
+    int lineWidth = (float)w * 0.1;    // 1 / 24
     int rumbleLeft = x - w - rumbleWidth;
     int rumbleRight = x + w;
     int laneOffset = w * 0.33;
@@ -83,12 +141,25 @@ void draw_segment(int x1, int y1, int w1, int x2, int y2, int w2, unsigned char 
     draw_patterned_hline(x + w, y, width - x - w, grassPattern);
 
     // lane markers
-    if(drawLanes) {
+    if (drawLanes)
+    {
       draw_patterned_hline(x - laneOffset - lineWidth / 2, y, lineWidth, solid_pattern);
       draw_patterned_hline(x + laneOffset - lineWidth / 2, y, lineWidth, solid_pattern);
     }
-    
+
     x += Xd;
     w += Wd;
   }
+}
+
+void draw_sprite(
+    unsigned char width,
+    unsigned char height,
+    int roadWidth,
+    unsigned char type,
+    float scale,
+    unsigned char destX,
+    unsigned char destY)
+{
+  Sprites::drawExternalMask(destX - 4, destY - 16, treeSmall, treeSmallMask, 0, 0);
 }
