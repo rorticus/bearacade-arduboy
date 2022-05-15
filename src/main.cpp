@@ -191,6 +191,7 @@ void loop()
   arduboy.clear();
 
   // render the background
+  draw_background();
 
   // render the road
   render_road();

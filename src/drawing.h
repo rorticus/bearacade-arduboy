@@ -15,4 +15,5 @@ void draw_sprite(
     float scale,
     unsigned char destX,
     unsigned char destY);
+void draw_background();
 #endif
