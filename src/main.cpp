@@ -130,11 +130,7 @@ void render_road()
                 2;
 
         draw_sprite(
-            width,
-            height,
-            roadW,
             seg->sprite,
-            seg->scale,
             spriteX,
             seg->y);
       }
@@ -149,11 +145,7 @@ void render_road()
                 2;
 
         draw_sprite(
-            width,
-            height,
-            roadW,
             seg->sprite,
-            seg->scale,
             spriteX,
             seg->y);
       }
@@ -188,7 +180,7 @@ void loop()
   arduboy.pollButtons();
 
   // first we clear our screen to black
-  arduboy.clear();
+  //arduboy.clear();
 
   // render the background
   draw_background();
