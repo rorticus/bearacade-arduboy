@@ -18,6 +18,7 @@ unsigned char lastIndex = 0;
 void add_segment(char curve)
 {
   unsigned char sprite = 0;
+  unsigned char obj = 0;
 
   if (rand() % 100 < 10)
   {
@@ -29,9 +30,19 @@ void add_segment(char curve)
     sprite |= SPRITE_TREE << 4;
   }
 
+  if(rand() % 200 < 10) {
+    unsigned char r = rand() % 100;
+    if(r < 33) {
+      obj |= OBJECT_BARREL;
+    } else if (r < 66) {
+      obj |= OBJECT_GAS;
+    }
+  }
+
   segments[segmentTail].curve = curve;
   segments[segmentTail].index = lastIndex;
   segments[segmentTail].sprite = sprite;
+  segments[segmentTail].objects = obj;
 
   lastIndex = (lastIndex + 1) % 20;
   segmentTail = (segmentTail + 1) % MAX_SEGMENTS;

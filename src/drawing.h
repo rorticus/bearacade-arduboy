@@ -9,8 +9,12 @@ void draw_patterned_hline(int x, int y, int w, const unsigned char *pattern);
 void draw_segment(int x1, int y1, int w1, int x2, int y2, int w2, unsigned char index);
 void draw_sprite(
     unsigned char type,
-    unsigned char destX,
-    unsigned char destY);
-    
+    int destX,
+    int destY);
+void draw_object(
+    unsigned char type,
+    int destX,
+    int destY);
+        
 void draw_background();
 #endif

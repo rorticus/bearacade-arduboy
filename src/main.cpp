@@ -111,7 +111,7 @@ void render_road()
     z += segL;
   }
 
-  for (int i = DRAW_DISTANCE - 1; i > 10; i--)
+  for (int i = DRAW_DISTANCE - 1; i > 0; i--)
   {
     segment *seg = get_segment(i);
 
@@ -150,6 +150,26 @@ void render_road()
             seg->y);
       }
     }
+
+    if(seg->objects) {
+      char left = OBJECT_LEFT(seg->objects);
+      char middle = OBJECT_MIDDLE(seg->objects);
+      char right = OBJECT_RIGHT(seg->objects);
+
+      if(right) {
+        int spriteX =
+            seg->x +
+            (seg->scale *
+             roadW *
+             width * 0.33) /
+                2;
+
+        draw_object(
+            right,
+            spriteX,
+            seg->y);
+      }
+    }
   }
 }
 
@@ -180,7 +200,7 @@ void loop()
   arduboy.pollButtons();
 
   // first we clear our screen to black
-  //arduboy.clear();
+  arduboy.clear();
 
   // render the background
   draw_background();

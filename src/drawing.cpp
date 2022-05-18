@@ -1,5 +1,6 @@
 #include <Arduboy2.h>
 #include "sprites.h"
+#include "track.h"
 
 extern Arduboy2 arduboy;
 
@@ -19,36 +20,36 @@ extern const unsigned char checkered_pattern[] = {
 };
 
 unsigned char almost_solid_pattern[] = {
-  0b10101010,
-  0b11011101,
-  0b10101010,
-  0b01110111,
-  0b10101010,
-  0b11011101,
-  0b10101010,
-  0b01110111,
+    0b10101010,
+    0b11011101,
+    0b10101010,
+    0b01110111,
+    0b10101010,
+    0b11011101,
+    0b10101010,
+    0b01110111,
 };
 
 unsigned char star_pattern[] = {
-  0b10101010,
-  0b01000100,
-  0b10101010,
-  0b01000100,
-  0b10101010,
-  0b01000100,
-  0b10101010,
-  0b01000100,
+    0b10101010,
+    0b01000100,
+    0b10101010,
+    0b01000100,
+    0b10101010,
+    0b01000100,
+    0b10101010,
+    0b01000100,
 };
 
 unsigned char sparse_pattern[] = {
-  0b00100010,
-  0b00000000,
-  0b10001000,
-  0b00000000,
-  0b00100010,
-  0b00000000,
-  0b10001000,
-  0b00000000,
+    0b00100010,
+    0b00000000,
+    0b10001000,
+    0b00000000,
+    0b00100010,
+    0b00000000,
+    0b10001000,
+    0b00000000,
 };
 
 void draw_patterned_hline(int x, int y, int w, const unsigned char *pattern)
@@ -115,13 +116,38 @@ void draw_segment(int x1, int y1, int w1, int x2, int y2, int w2, unsigned char 
 
 void draw_sprite(
     unsigned char type,
-    unsigned char destX,
-    unsigned char destY)
+    int destX,
+    int destY)
 {
+  if (destY - 16 > 64 || destY < 0 || destX < 0 || destX > 128)
+  {
+    return;
+  }
+
   Sprites::drawExternalMask(destX - 4, destY - 16, treeSmall, treeSmallMask, 0, 0);
 }
 
-void draw_background() {
+void draw_object(
+    unsigned char type,
+    int destX,
+    int destY)
+{
+  if (destY - 8 > 64 || destY < 0 || destX < 0 || destX > 128)
+  {
+    return;
+  }
+
+  if (type == OBJECT_BARREL)
+  {
+    Sprites::drawExternalMask(destX - 3, destY - 4, drum, drumMask, 0, 0);
+  }
+  else if (type == OBJECT_GAS) {
+    Sprites::drawExternalMask(destX - 3, destY - 4, gasCan, gasCanMask, 0, 0);
+  }
+}
+
+void draw_background()
+{
   arduboy.clear();
   arduboy.drawBitmap(0, 2, mountains, 128, 32);
 }
