@@ -1,12 +1,15 @@
 #include "track.h"
 #include <stdlib.h>
 
+#define OBJECT_FREQ 6
+
 segment segments[MAX_SEGMENTS];
 unsigned char segmentHead = 0;
 unsigned char segmentTail = 0;
 
 // the last added track index
 unsigned char lastIndex = 0;
+unsigned char segFreq = 0;
 
 #define ROAD_STRAIGHT 0
 #define ROAD_LEFT_CURVE_SOFT 1
@@ -14,6 +17,28 @@ unsigned char lastIndex = 0;
 #define ROAD_LEFT_CURVE_HARD 3
 #define ROAD_RIGHT_CURVE_HARD 4
 #define MAX_ROAD_TYPES 5
+
+#define NO_BARRELS          0
+#define BARREL_RIGHT        1
+#define BARREL_MIDDLE       2
+#define BARREL_MIDDLE_RIGHT 3
+#define BARREL_LEFT         4
+#define BARREL_LEFT_RIGHT   5
+#define BARREL_LEFT_MIDDLE  6
+
+#define NUM_OBJ_CASES 7
+#define NUM_OBJ_CHANCES 10
+
+unsigned char lastObjects = 0;
+const unsigned char objectDecider[NUM_OBJ_CASES][NUM_OBJ_CHANCES] = {
+  /* 0 000 */ { 0, 0, 0, 0, 0, BARREL_LEFT, BARREL_LEFT_MIDDLE, BARREL_MIDDLE, BARREL_RIGHT, BARREL_MIDDLE_RIGHT},
+  /* 1 001 */ { 0, 0, 0, 0, 0, BARREL_LEFT, BARREL_RIGHT, BARREL_MIDDLE_RIGHT, BARREL_MIDDLE, 0},
+  /* 2 010 */ { 0, 0, 0, 0, 0, BARREL_RIGHT, BARREL_LEFT, BARREL_MIDDLE_RIGHT, BARREL_LEFT_MIDDLE, BARREL_MIDDLE},
+  /* 3 011 */ { 0, 0, 0, 0, 0, BARREL_MIDDLE, BARREL_MIDDLE_RIGHT, BARREL_RIGHT, 0, 0},
+  /* 4 100 */ { 0, 0, 0, 0, 0, BARREL_LEFT, BARREL_MIDDLE, BARREL_LEFT_MIDDLE, BARREL_RIGHT, 0},
+  /* 5 101 */ { 0, 0, 0, 0, 0, BARREL_LEFT, BARREL_RIGHT, 0, 0, 0},
+  /* 6 110 */ { 0, 0, 0, 0, 0, BARREL_LEFT, BARREL_LEFT_MIDDLE, BARREL_MIDDLE, 0, 0}
+};
 
 void add_segment(char curve)
 {
@@ -30,12 +55,24 @@ void add_segment(char curve)
     sprite |= SPRITE_TREE << 4;
   }
 
-  if(rand() % 200 < 10) {
-    unsigned char r = rand() % 100;
-    if(r < 33) {
+  segFreq++;
+  if (segFreq > OBJECT_FREQ)
+  {
+    segFreq = 0;
+    
+    unsigned char barrels = objectDecider[lastObjects][rand() % NUM_OBJ_CHANCES];
+    lastObjects = obj;
+
+    if((barrels & 1) == 1) {
       obj |= OBJECT_BARREL;
-    } else if (r < 66) {
-      obj |= OBJECT_GAS;
+    }
+
+    if((barrels & 2) == 2) {
+      obj |= OBJECT_BARREL << 2;
+    }
+
+    if((barrels & 4) == 4) {
+      obj |= OBJECT_BARREL << 4;
     }
   }
 

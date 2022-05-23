@@ -135,7 +135,7 @@ void render_road()
             seg->y);
       }
 
-            if (rightSprite != SPRITE_NONE)
+      if (rightSprite != SPRITE_NONE)
       {
         int spriteX =
             seg->x +
@@ -151,12 +151,14 @@ void render_road()
       }
     }
 
-    if(seg->objects) {
+    if (seg->objects)
+    {
       char left = OBJECT_LEFT(seg->objects);
       char middle = OBJECT_MIDDLE(seg->objects);
       char right = OBJECT_RIGHT(seg->objects);
 
-      if(right) {
+      if (right)
+      {
         int spriteX =
             seg->x +
             (seg->scale *
@@ -166,6 +168,32 @@ void render_road()
 
         draw_object(
             right,
+            spriteX,
+            seg->y);
+      }
+
+      if (middle)
+      {
+        int spriteX =
+            seg->x;
+
+        draw_object(
+            middle,
+            spriteX,
+            seg->y);
+      }
+
+      if (left)
+      {
+        int spriteX =
+            seg->x -
+            (seg->scale *
+             roadW *
+             width * 0.33) /
+                2;
+
+        draw_object(
+            left,
             spriteX,
             seg->y);
       }
