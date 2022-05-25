@@ -54,7 +54,7 @@ const uint8_t PROGMEM player[] = {
 // make an instance of arduboy used for many functions
 Arduboy2 arduboy;
 
-#define DRAW_DISTANCE 50
+#define DRAW_DISTANCE 35
 
 int roadW = 2800;
 int segL = 256;

@@ -18,27 +18,26 @@ unsigned char segFreq = 0;
 #define ROAD_RIGHT_CURVE_HARD 4
 #define MAX_ROAD_TYPES 5
 
-#define NO_BARRELS          0
-#define BARREL_RIGHT        1
-#define BARREL_MIDDLE       2
+#define NO_BARRELS 0
+#define BARREL_RIGHT 1
+#define BARREL_MIDDLE 2
 #define BARREL_MIDDLE_RIGHT 3
-#define BARREL_LEFT         4
-#define BARREL_LEFT_RIGHT   5
-#define BARREL_LEFT_MIDDLE  6
+#define BARREL_LEFT 4
+#define BARREL_LEFT_RIGHT 5
+#define BARREL_LEFT_MIDDLE 6
 
 #define NUM_OBJ_CASES 7
 #define NUM_OBJ_CHANCES 10
 
 unsigned char lastObjects = 0;
 const unsigned char objectDecider[NUM_OBJ_CASES][NUM_OBJ_CHANCES] = {
-  /* 0 000 */ { 0, 0, 0, 0, 0, BARREL_LEFT, BARREL_LEFT_MIDDLE, BARREL_MIDDLE, BARREL_RIGHT, BARREL_MIDDLE_RIGHT},
-  /* 1 001 */ { 0, 0, 0, 0, 0, BARREL_LEFT, BARREL_RIGHT, BARREL_MIDDLE_RIGHT, BARREL_MIDDLE, 0},
-  /* 2 010 */ { 0, 0, 0, 0, 0, BARREL_RIGHT, BARREL_LEFT, BARREL_MIDDLE_RIGHT, BARREL_LEFT_MIDDLE, BARREL_MIDDLE},
-  /* 3 011 */ { 0, 0, 0, 0, 0, BARREL_MIDDLE, BARREL_MIDDLE_RIGHT, BARREL_RIGHT, 0, 0},
-  /* 4 100 */ { 0, 0, 0, 0, 0, BARREL_LEFT, BARREL_MIDDLE, BARREL_LEFT_MIDDLE, BARREL_RIGHT, 0},
-  /* 5 101 */ { 0, 0, 0, 0, 0, BARREL_LEFT, BARREL_RIGHT, 0, 0, 0},
-  /* 6 110 */ { 0, 0, 0, 0, 0, BARREL_LEFT, BARREL_LEFT_MIDDLE, BARREL_MIDDLE, 0, 0}
-};
+    /* 0 000 */ {0, 0, 0, 0, 0, BARREL_LEFT, BARREL_LEFT_MIDDLE, BARREL_MIDDLE, BARREL_RIGHT, BARREL_MIDDLE_RIGHT},
+    /* 1 001 */ {0, 0, 0, 0, 0, BARREL_LEFT, BARREL_RIGHT, BARREL_MIDDLE_RIGHT, BARREL_MIDDLE, 0},
+    /* 2 010 */ {0, 0, 0, 0, 0, BARREL_RIGHT, BARREL_LEFT, BARREL_MIDDLE_RIGHT, BARREL_LEFT_MIDDLE, BARREL_MIDDLE},
+    /* 3 011 */ {0, 0, 0, 0, 0, BARREL_MIDDLE, BARREL_MIDDLE_RIGHT, BARREL_RIGHT, 0, 0},
+    /* 4 100 */ {0, 0, 0, 0, 0, BARREL_LEFT, BARREL_MIDDLE, BARREL_LEFT_MIDDLE, BARREL_RIGHT, 0},
+    /* 5 101 */ {0, 0, 0, 0, 0, BARREL_LEFT, BARREL_RIGHT, 0, 0, 0},
+    /* 6 110 */ {0, 0, 0, 0, 0, BARREL_LEFT, BARREL_LEFT_MIDDLE, BARREL_MIDDLE, 0, 0}};
 
 void add_segment(char curve)
 {
@@ -59,20 +58,69 @@ void add_segment(char curve)
   if (segFreq > OBJECT_FREQ)
   {
     segFreq = 0;
-    
+
     unsigned char barrels = objectDecider[lastObjects][rand() % NUM_OBJ_CHANCES];
     lastObjects = obj;
 
-    if((barrels & 1) == 1) {
+    if ((barrels & 1) == 1)
+    {
       obj |= OBJECT_BARREL;
     }
 
-    if((barrels & 2) == 2) {
+    if ((barrels & 2) == 2)
+    {
       obj |= OBJECT_BARREL << 2;
     }
 
-    if((barrels & 4) == 4) {
+    if ((barrels & 4) == 4)
+    {
       obj |= OBJECT_BARREL << 4;
+    }
+
+    char blankLeft = OBJECT_LEFT(obj) == OBJECT_NONE;
+    char blankMiddle = OBJECT_MIDDLE(obj) == OBJECT_NONE;
+    char blankRight = OBJECT_RIGHT(obj) == OBJECT_NONE;
+
+    if (blankLeft)
+    {
+      int n = rand() % 100;
+
+      if (n < 10)
+      {
+        obj |= OBJECT_GAS << 4;
+      }
+      else if (n < 20)
+      {
+        obj |= OBJECT_BEAR << 4;
+      }
+    }
+
+    if (blankMiddle)
+    {
+      int n = rand() % 1000;
+
+      if (n < 10)
+      {
+        obj |= OBJECT_GAS << 2;
+      }
+      else if (n < 20)
+      {
+        obj |= OBJECT_BEAR << 2;
+      }
+    }
+
+    if (blankRight)
+    {
+      int n = rand() % 1000;
+
+      if (n < 10)
+      {
+        obj |= OBJECT_GAS;
+      }
+      else if (n < 20)
+      {
+        obj |= OBJECT_BEAR;
+      }
     }
   }
 
