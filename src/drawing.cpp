@@ -151,3 +151,19 @@ void draw_background()
   arduboy.clear();
   arduboy.drawBitmap(0, 2, mountains, 128, 32);
 }
+
+void draw_fuel(float percentage) {
+  char w = 75;
+  char h = 4;
+  char left = 2;
+  char top = 2;
+  char fillWidth = w * percentage;
+
+  arduboy.fillRect(left, top, w, h, 0);
+  arduboy.drawRect(left, top, w, h);
+
+  draw_patterned_hline(left + 1, top + 1, fillWidth, checkered_pattern);
+  draw_patterned_hline(left + 1, top + 2, fillWidth, checkered_pattern);
+  
+  arduboy.drawFastVLine(left + fillWidth, top, h);
+}

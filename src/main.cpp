@@ -55,6 +55,8 @@ const uint8_t PROGMEM player[] = {
 Arduboy2 arduboy;
 
 #define DRAW_DISTANCE 35
+#define MAX_FUEL 1000
+#define FUEL_USAGE 1
 
 int roadW = 2800;
 int segL = 256;
@@ -63,6 +65,7 @@ int height;
 int width;
 int cameraX = 0;
 int targetLane = 1;
+int fuel = MAX_FUEL;
 
 void project(
     float x, float y, float z,
@@ -237,9 +240,11 @@ void loop()
   render_road();
 
   // render the player
-  //  arduboy.fillRect(width / 2 - 8, height - 2 - 12, 16, 12);
   arduboy.fillRect(width / 2 - 8, height - 2 - 14, 16, 14, 0);
   arduboy.drawBitmap(width / 2 - 8, height - 2 - 14, player, 16, 14);
+
+  // draw the fuel bar
+  draw_fuel((float)fuel / MAX_FUEL);
 
   add_next_track();
 
@@ -247,6 +252,13 @@ void loop()
   arduboy.display();
 
   advance_track(1);
+
+  fuel -= FUEL_USAGE;
+  if (fuel < 0)
+  {
+    fuel = 0;
+    // game over!
+  }
 
   int targetX = (targetLane - 1) * 1000;
 

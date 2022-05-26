@@ -17,4 +17,6 @@ void draw_object(
     int destY);
         
 void draw_background();
+void draw_fuel(float percentage);
+
 #endif
