@@ -66,6 +66,8 @@ int width;
 int cameraX = 0;
 int targetLane = 1;
 int fuel = MAX_FUEL;
+char isDriving = 0;
+char colission = 0;
 
 void project(
     float x, float y, float z,
@@ -173,6 +175,11 @@ void render_road()
             right,
             spriteX,
             seg->y);
+
+        if (i == 2 && spriteX > width / 2 - 8 && spriteX < width / 2 + 8)
+        {
+          colission = right;
+        }
       }
 
       if (middle)
@@ -184,6 +191,11 @@ void render_road()
             middle,
             spriteX,
             seg->y);
+
+        if (i == 2 && spriteX > width / 2 - 8 && spriteX < width / 2 + 8)
+        {
+          colission = middle;
+        }
       }
 
       if (left)
@@ -199,6 +211,11 @@ void render_road()
             left,
             spriteX,
             seg->y);
+
+        if (i == 2 && spriteX > width / 2 - 8 && spriteX < width / 2 + 8)
+        {
+          colission = left;
+        }
       }
     }
   }
@@ -218,6 +235,8 @@ void setup()
   arduboy.setFrameRate(15);
 
   reset_road();
+
+  isDriving = 1;
 }
 
 // our main game loop, this runs once every cycle/frame.
@@ -232,6 +251,7 @@ void loop()
 
   // first we clear our screen to black
   arduboy.clear();
+  colission = 0;
 
   // render the background
   draw_background();
@@ -246,44 +266,55 @@ void loop()
   // draw the fuel bar
   draw_fuel((float)fuel / MAX_FUEL);
 
+  if (colission)
+  {
+    arduboy.fillCircle(5, 5, 5);
+  }
+
   add_next_track();
 
   // then we finaly we tell the arduboy to display what we just wrote to the display
   arduboy.display();
 
-  advance_track(1);
+  if (isDriving)
+  {
+    advance_track(1);
+  }
 
   fuel -= FUEL_USAGE;
   if (fuel < 0)
   {
     fuel = 0;
-    // game over!
+    isDriving = 0;
   }
 
   int targetX = (targetLane - 1) * 1000;
 
-  if (targetX < cameraX)
+  if (isDriving)
   {
-    cameraX -= 200;
-  }
-  else if (targetX > cameraX)
-  {
-    cameraX += 200;
-  }
-  else
-  {
-    if (arduboy.pressed(LEFT_BUTTON))
+    if (targetX < cameraX)
     {
-      if (targetLane > 0)
-      {
-        targetLane--;
-      }
+      cameraX -= 250;
     }
-    if (arduboy.pressed(RIGHT_BUTTON))
+    else if (targetX > cameraX)
     {
-      if (targetLane < 2)
+      cameraX += 250;
+    }
+    else
+    {
+      if (arduboy.pressed(LEFT_BUTTON))
       {
-        targetLane++;
+        if (targetLane > 0)
+        {
+          targetLane--;
+        }
+      }
+      if (arduboy.pressed(RIGHT_BUTTON))
+      {
+        if (targetLane < 2)
+        {
+          targetLane++;
+        }
       }
     }
   }
