@@ -57,6 +57,7 @@ Arduboy2 arduboy;
 #define DRAW_DISTANCE 35
 #define MAX_FUEL 1000
 #define FUEL_USAGE 1
+#define COLLISION_INDEX 6
 
 int roadW = 2800;
 int segL = 256;
@@ -176,7 +177,7 @@ void render_road()
             spriteX,
             seg->y);
 
-        if (i == 2 && spriteX > width / 2 - 8 && spriteX < width / 2 + 8)
+        if (i == COLLISION_INDEX && spriteX > width / 2 - 8 && spriteX < width / 2 + 8)
         {
           colission = right;
         }
@@ -192,7 +193,7 @@ void render_road()
             spriteX,
             seg->y);
 
-        if (i == 2 && spriteX > width / 2 - 8 && spriteX < width / 2 + 8)
+        if (i == COLLISION_INDEX && spriteX > width / 2 - 8 && spriteX < width / 2 + 8)
         {
           colission = middle;
         }
@@ -212,7 +213,7 @@ void render_road()
             spriteX,
             seg->y);
 
-        if (i == 2 && spriteX > width / 2 - 8 && spriteX < width / 2 + 8)
+        if (i == COLLISION_INDEX && spriteX > width / 2 - 8 && spriteX < width / 2 + 8)
         {
           colission = left;
         }
@@ -266,9 +267,15 @@ void loop()
   // draw the fuel bar
   draw_fuel((float)fuel / MAX_FUEL);
 
-  if (colission)
+  if (colission == OBJECT_BARREL)
   {
-    arduboy.fillCircle(5, 5, 5);
+    // TODO: crash
+    isDriving = false;
+  } else if (colission == OBJECT_GAS) {
+    fuel = min(MAX_FUEL, fuel + 100);
+    // todo: dissappear fuel can
+  } else if (colission == OBJECT_BEAR) {
+    // todo collect bear
   }
 
   add_next_track();
@@ -276,16 +283,16 @@ void loop()
   // then we finaly we tell the arduboy to display what we just wrote to the display
   arduboy.display();
 
-  if (isDriving)
+  if (isDriving && arduboy.pressed(UP_BUTTON))
   {
     advance_track(1);
-  }
 
-  fuel -= FUEL_USAGE;
-  if (fuel < 0)
-  {
-    fuel = 0;
-    isDriving = 0;
+    fuel -= FUEL_USAGE;
+    if (fuel < 0)
+    {
+      fuel = 0;
+      isDriving = 0;
+    }
   }
 
   int targetX = (targetLane - 1) * 1000;

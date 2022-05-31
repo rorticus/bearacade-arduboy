@@ -153,7 +153,7 @@ void draw_background()
 }
 
 void draw_fuel(float percentage) {
-  char w = 75;
+  char w = 50;
   char h = 4;
   char left = 2;
   char top = 2;
