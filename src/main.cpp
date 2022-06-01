@@ -14,42 +14,7 @@ version 2.1 of the License, or (at your option) any later version.
 #include <Arduboy2.h>
 #include "drawing.h"
 #include "track.h"
-
-// 16x14
-const uint8_t PROGMEM player[] = {
-    0x30,
-    0xfe,
-    0x0a,
-    0xaa,
-    0xaa,
-    0xaa,
-    0xaa,
-    0xaa,
-    0xaa,
-    0xaa,
-    0xaa,
-    0xaa,
-    0xaa,
-    0x0a,
-    0xfe,
-    0x30,
-    0x00,
-    0x3f,
-    0x3a,
-    0x3a,
-    0x0a,
-    0x0a,
-    0x0f,
-    0x0d,
-    0x0d,
-    0x0f,
-    0x0a,
-    0x0a,
-    0x3a,
-    0x3a,
-    0x3f,
-    0x00,
-};
+#include "sprites.h"
 
 // make an instance of arduboy used for many functions
 Arduboy2 arduboy;

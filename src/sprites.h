@@ -14,4 +14,6 @@ extern const uint8_t PROGMEM drumMask[];
 extern const uint8_t PROGMEM gasCan[];
 extern const uint8_t PROGMEM gasCanMask[];
 
+extern const uint8_t PROGMEM player[];
+
 #endif
