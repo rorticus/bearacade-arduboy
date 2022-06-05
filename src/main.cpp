@@ -248,7 +248,7 @@ void loop()
   // then we finaly we tell the arduboy to display what we just wrote to the display
   arduboy.display();
 
-  if (isDriving && arduboy.pressed(UP_BUTTON))
+  if (isDriving)
   {
     advance_track(1);
 

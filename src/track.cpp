@@ -1,7 +1,7 @@
 #include "track.h"
 #include <stdlib.h>
 
-#define OBJECT_FREQ 6
+#define OBJECT_FREQ 8
 
 segment segments[MAX_SEGMENTS];
 unsigned char segmentHead = 0;
