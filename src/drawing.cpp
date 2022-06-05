@@ -124,7 +124,7 @@ void draw_sprite(
     return;
   }
 
-  Sprites::drawExternalMask(destX - 4, destY - 16, treeSmall, treeSmallMask, 0, 0);
+  Sprites::drawExternalMask(destX - 8, destY - 16, treeSmall, treeSmallMask, 0, 0);
 }
 
 void draw_object(
@@ -139,9 +139,17 @@ void draw_object(
 
   if (type == OBJECT_BARREL)
   {
-    Sprites::drawExternalMask(destX - 3, destY - 4, drum, drumMask, 0, 0);
+    if (destY < 50)
+    {
+      Sprites::drawExternalMask(destX - 8, destY - 16, drumSmall, drumSmallMask, 0, 0);
+    }
+    else
+    {
+      Sprites::drawExternalMask(destX - 8, destY - 16, drum, drumMask, 0, 0);
+    }
   }
-  else if (type == OBJECT_GAS) {
+  else if (type == OBJECT_GAS)
+  {
     Sprites::drawExternalMask(destX - 3, destY - 4, gasCan, gasCanMask, 0, 0);
   }
 }
@@ -152,7 +160,8 @@ void draw_background()
   arduboy.drawBitmap(0, 2, mountains, 128, 32);
 }
 
-void draw_fuel(float percentage) {
+void draw_fuel(float percentage)
+{
   char w = 50;
   char h = 4;
   char left = 2;
@@ -164,6 +173,6 @@ void draw_fuel(float percentage) {
 
   draw_patterned_hline(left + 1, top + 1, fillWidth, checkered_pattern);
   draw_patterned_hline(left + 1, top + 2, fillWidth, checkered_pattern);
-  
+
   arduboy.drawFastVLine(left + fillWidth, top, h);
 }

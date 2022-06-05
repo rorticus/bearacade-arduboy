@@ -226,8 +226,8 @@ void loop()
   render_road();
 
   // render the player
-  arduboy.fillRect(width / 2 - 8, height - 2 - 14, 16, 14, 0);
-  arduboy.drawBitmap(width / 2 - 8, height - 2 - 14, player, 16, 14);
+  arduboy.fillRect(width / 2 - 8, height - 2 - 16, 16, 16, 0);
+  arduboy.drawBitmap(width / 2 - 8, height - 2 - 16, player, 16, 16);
 
   // draw the fuel bar
   draw_fuel((float)fuel / MAX_FUEL);
