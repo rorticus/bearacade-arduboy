@@ -33,6 +33,8 @@ int cameraX = 0;
 int targetLane = 1;
 int fuel = MAX_FUEL;
 char isDriving = 0;
+char isGameOver = 0;
+int notDrivingTimer = 0;
 char colission = 0;
 
 void project(
@@ -205,18 +207,8 @@ void setup()
   isDriving = 1;
 }
 
-// our main game loop, this runs once every cycle/frame.
-// this is where our game logic goes.
-void loop()
+void game()
 {
-  // pause render until it's time for the next frame
-  if (!(arduboy.nextFrame()))
-    return;
-
-  arduboy.pollButtons();
-
-  // first we clear our screen to black
-  arduboy.clear();
   colission = 0;
 
   // render the background
@@ -236,10 +228,14 @@ void loop()
   {
     // TODO: crash
     isDriving = false;
-  } else if (colission == OBJECT_GAS) {
+  }
+  else if (colission == OBJECT_GAS)
+  {
     fuel = min(MAX_FUEL, fuel + 100);
     // todo: dissappear fuel can
-  } else if (colission == OBJECT_BEAR) {
+  }
+  else if (colission == OBJECT_BEAR)
+  {
     // todo collect bear
   }
 
@@ -257,6 +253,14 @@ void loop()
     {
       fuel = 0;
       isDriving = 0;
+    }
+  }
+
+  if(!isDriving) {
+    notDrivingTimer++;
+
+    if(notDrivingTimer > 30) {
+      isGameOver = 1;
     }
   }
 
@@ -289,5 +293,54 @@ void loop()
         }
       }
     }
+  }
+}
+
+void game_over()
+{
+  Sprites::drawSelfMasked(width - 48, height - 48, bearLogo, 0);
+
+  arduboy.setCursor(20, 10);
+  arduboy.print("GAME OVER");
+
+  arduboy.setCursor(0, 40);
+  arduboy.println("press A to");
+  arduboy.println("play again.");
+
+  if(arduboy.pressed(A_BUTTON)) {
+    reset_road();
+
+    colission = 0;
+    isGameOver = 0;
+    isDriving = 1;
+    targetLane = 1;
+    fuel = MAX_FUEL;
+    cameraX = 0;
+    notDrivingTimer = 0;
+  }
+
+  arduboy.display();
+}
+
+// our main game loop, this runs once every cycle/frame.
+// this is where our game logic goes.
+void loop()
+{
+  // pause render until it's time for the next frame
+  if (!(arduboy.nextFrame()))
+    return;
+
+  arduboy.pollButtons();
+
+  // first we clear our screen to black
+  arduboy.clear();
+
+  if (!isGameOver)
+  {
+    game();
+  }
+  else
+  {
+    game_over();
   }
 }

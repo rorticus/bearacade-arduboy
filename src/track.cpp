@@ -213,6 +213,8 @@ void add_next_track()
 
 void reset_road()
 {
+  segmentHead = segmentTail = 0;
+  
   add_road(0, 16, 0, 0);
 
   while (track_length() < MAX_SEGMENTS - 33)
