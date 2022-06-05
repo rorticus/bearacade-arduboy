@@ -13,6 +13,12 @@ extern const uint8_t PROGMEM drumMask[];
 extern const uint8_t PROGMEM drumSmall[];
 extern const uint8_t PROGMEM drumSmallMask[];
 
+extern const uint8_t PROGMEM bear[];
+extern const uint8_t PROGMEM bearMask[];
+
+extern const uint8_t PROGMEM bearSmall[];
+extern const uint8_t PROGMEM bearSmallMask[];
+
 extern const uint8_t PROGMEM gasCan[];
 extern const uint8_t PROGMEM gasCanMask[];
 

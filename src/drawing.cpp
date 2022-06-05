@@ -152,6 +152,17 @@ void draw_object(
   {
     Sprites::drawExternalMask(destX - 3, destY - 4, gasCan, gasCanMask, 0, 0);
   }
+  else if (type == OBJECT_BEAR)
+  {
+    if (destY < 50)
+    {
+      Sprites::drawExternalMask(destX - 8, destY - 16, bearSmall, bearSmallMask, 0, 0);
+    }
+    else
+    {
+      Sprites::drawExternalMask(destX - 8, destY - 16, bear, bearMask, 0, 0);
+    }
+  }
 }
 
 void draw_background()
