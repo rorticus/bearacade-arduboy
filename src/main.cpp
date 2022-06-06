@@ -36,6 +36,7 @@ char isDriving = 0;
 char isGameOver = 0;
 int notDrivingTimer = 0;
 char colission = 0;
+int score = 0;
 
 void project(
     float x, float y, float z,
@@ -189,6 +190,20 @@ void render_road()
   }
 }
 
+void game_reset()
+{
+  reset_road();
+
+  colission = 0;
+  isGameOver = 0;
+  isDriving = 1;
+  targetLane = 1;
+  fuel = MAX_FUEL;
+  cameraX = 0;
+  notDrivingTimer = 0;
+  score = 0;
+}
+
 // This function runs once in your game.
 // use it for anything that needs to be set only once in your game.
 void setup()
@@ -202,12 +217,10 @@ void setup()
   // default 60 and it saves us battery life
   arduboy.setFrameRate(15);
 
-  reset_road();
-
-  isDriving = 1;
+  game_reset();
 }
 
-void game()
+void game_render()
 {
   colission = 0;
 
@@ -224,6 +237,12 @@ void game()
   // draw the fuel bar
   draw_fuel((float)fuel / MAX_FUEL);
 
+  // then we finaly we tell the arduboy to display what we just wrote to the display
+  arduboy.display();
+}
+
+void game_update()
+{
   if (colission == OBJECT_BARREL)
   {
     // TODO: crash
@@ -241,9 +260,6 @@ void game()
 
   add_next_track();
 
-  // then we finaly we tell the arduboy to display what we just wrote to the display
-  arduboy.display();
-
   if (isDriving)
   {
     advance_track(1);
@@ -256,10 +272,12 @@ void game()
     }
   }
 
-  if(!isDriving) {
+  if (!isDriving)
+  {
     notDrivingTimer++;
 
-    if(notDrivingTimer > 30) {
+    if (notDrivingTimer > 30)
+    {
       isGameOver = 1;
     }
   }
@@ -296,6 +314,12 @@ void game()
   }
 }
 
+void game()
+{
+  game_render();
+  game_update();
+}
+
 void game_over()
 {
   Sprites::drawSelfMasked(width - 48, height - 48, bearLogo, 0);
@@ -307,16 +331,9 @@ void game_over()
   arduboy.println("press A to");
   arduboy.println("play again.");
 
-  if(arduboy.pressed(A_BUTTON)) {
-    reset_road();
-
-    colission = 0;
-    isGameOver = 0;
-    isDriving = 1;
-    targetLane = 1;
-    fuel = MAX_FUEL;
-    cameraX = 0;
-    notDrivingTimer = 0;
+  if (arduboy.pressed(A_BUTTON))
+  {
+    game_reset();
   }
 
   arduboy.display();
