@@ -237,6 +237,15 @@ void game_render()
   // draw the fuel bar
   draw_fuel((float)fuel / MAX_FUEL);
 
+  // draw the score
+  char scoreStr[16];
+  sprintf(scoreStr, "%d", score);
+  char scoreWidth = arduboy.getCharacterWidth() * strlen(scoreStr);
+
+  arduboy.fillRect(width - scoreWidth, 0, scoreWidth, arduboy.getCharacterHeight());
+  arduboy.setCursor(width - scoreWidth, 0);
+  arduboy.print(scoreStr);
+
   // then we finaly we tell the arduboy to display what we just wrote to the display
   arduboy.display();
 }
@@ -256,6 +265,7 @@ void game_update()
   else if (colission == OBJECT_BEAR)
   {
     // todo collect bear
+    score += 100;
   }
 
   add_next_track();
