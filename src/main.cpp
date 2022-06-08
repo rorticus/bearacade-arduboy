@@ -36,6 +36,7 @@ char isDriving = 0;
 char isGameOver = 0;
 int notDrivingTimer = 0;
 char colission = 0;
+char colissionMask = 0;
 int score = 0;
 
 void project(
@@ -148,6 +149,7 @@ void render_road()
         if (i == COLLISION_INDEX && spriteX > width / 2 - 8 && spriteX < width / 2 + 8)
         {
           colission = right;
+          colissionMask = 0b00111100;
         }
       }
 
@@ -164,6 +166,7 @@ void render_road()
         if (i == COLLISION_INDEX && spriteX > width / 2 - 8 && spriteX < width / 2 + 8)
         {
           colission = middle;
+          colissionMask = 0b00110011;
         }
       }
 
@@ -184,6 +187,7 @@ void render_road()
         if (i == COLLISION_INDEX && spriteX > width / 2 - 8 && spriteX < width / 2 + 8)
         {
           colission = left;
+          colissionMask = 0b00001111;
         }
       }
     }
@@ -223,6 +227,7 @@ void setup()
 void game_render()
 {
   colission = 0;
+  colissionMask = 0xFF;
 
   // render the background
   draw_background();
@@ -240,7 +245,7 @@ void game_render()
   // draw the score
   char scoreStr[16];
   sprintf(scoreStr, "%d", score);
-  char scoreWidth = arduboy.getCharacterWidth() * strlen(scoreStr);
+  char scoreWidth = (arduboy.getCharacterWidth() + arduboy.getCharacterSpacing()) * strlen(scoreStr);
 
   arduboy.fillRect(width - scoreWidth, 0, scoreWidth, arduboy.getCharacterHeight());
   arduboy.setCursor(width - scoreWidth, 0);
@@ -260,12 +265,14 @@ void game_update()
   else if (colission == OBJECT_GAS)
   {
     fuel = min(MAX_FUEL, fuel + 100);
-    // todo: dissappear fuel can
+    segment *seg = get_segment(COLLISION_INDEX);
+    seg->objects &= colissionMask;
   }
   else if (colission == OBJECT_BEAR)
   {
-    // todo collect bear
     score += 100;
+    segment *seg = get_segment(COLLISION_INDEX);
+    seg->objects &= colissionMask;
   }
 
   add_next_track();
