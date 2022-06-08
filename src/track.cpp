@@ -179,34 +179,41 @@ segment *get_segment(unsigned char index)
 
 void advance_track(unsigned char count)
 {
-  segmentHead = (segmentHead + count) % MAX_SEGMENTS;
+  for (unsigned char i = 0; i < count; i++)
+  {
+    segmentHead = (segmentHead + 1) % MAX_SEGMENTS;
+    if (segmentHead == segmentTail)
+    {
+      segmentTail = (segmentTail + 1) % MAX_SEGMENTS;
+    }
+  }
 }
 
 void add_next_track()
 {
-  char tile = rand() % MAX_ROAD_TYPES;
-
-  if (track_length() > MAX_SEGMENTS - 33)
+  if (track_length() >= MAX_SEGMENTS - TRACK_FEATURE_LENGTH)
   {
     return;
   }
 
+  char tile = rand() % MAX_ROAD_TYPES;
+
   switch (tile)
   {
   case ROAD_STRAIGHT:
-    add_road(0, 32, 0, 0);
+    add_road(0, TRACK_FEATURE_LENGTH, 0, 0);
     break;
   case ROAD_LEFT_CURVE_SOFT:
-    add_road(0, 32, 0, -2);
+    add_road(0, TRACK_FEATURE_LENGTH, 0, -2);
     break;
   case ROAD_RIGHT_CURVE_SOFT:
-    add_road(0, 32, 0, 2);
+    add_road(0, TRACK_FEATURE_LENGTH, 0, 2);
     break;
   case ROAD_RIGHT_CURVE_HARD:
-    add_road(0, 32, 0, 8);
+    add_road(0, TRACK_FEATURE_LENGTH, 0, 8);
     break;
   case ROAD_LEFT_CURVE_HARD:
-    add_road(0, 32, 0, -8);
+    add_road(0, TRACK_FEATURE_LENGTH, 0, -8);
     break;
   }
 }
@@ -214,10 +221,10 @@ void add_next_track()
 void reset_road()
 {
   segmentHead = segmentTail = 0;
-  
+
   add_road(0, 16, 0, 0);
 
-  while (track_length() < MAX_SEGMENTS - 33)
+  for (char i = 0; i < MAX_SEGMENTS - TRACK_FEATURE_LENGTH; i++)
   {
     add_next_track();
   }
