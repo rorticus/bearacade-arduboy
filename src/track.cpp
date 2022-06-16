@@ -222,8 +222,10 @@ void reset_road()
 {
   segmentHead = segmentTail = 0;
 
-  add_road(0, 45, 0, 0);
-  for(char i = 0; i < 45; i++) {
+  add_road(0, 30, 0, 0);
+  
+  // clear out the objects so its just a straight road
+  for(char i = 0; i < 30; i++) {
     get_segment(i)->objects = 0;
   }
 
