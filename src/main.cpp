@@ -12,21 +12,26 @@ version 2.1 of the License, or (at your option) any later version.
 */
 
 #include <Arduboy2.h>
+#include <ArduboyPlaytune.h>
 #include "drawing.h"
 #include "track.h"
 #include "sprites.h"
 
 // make an instance of arduboy used for many functions
 Arduboy2 arduboy;
+ArduboyPlaytune tunes(arduboy.audio.enabled);
+
+const byte musicScore[] PROGMEM = {0x90, 83, 0, 75, 0x80, 0x90, 88, 0, 225, 0x80, 0xf0};
 
 #define DRAW_DISTANCE 35
 #define MAX_FUEL 1000
 #define FUEL_USAGE 1
-#define COLLISION_INDEX 6
+#define COLLISION_INDEX 4
 
+const int cameraHeight = 1200;
 int roadW = 2800;
 int segL = 256;
-float camD = 0.84;
+float camD = 0.9;
 int height;
 int width;
 int cameraX = 0;
@@ -38,6 +43,7 @@ int notDrivingTimer = 0;
 char colission = 0;
 char colissionMask = 0;
 int score = 0;
+char isGameStarted = 0;
 
 void project(
     float x, float y, float z,
@@ -66,7 +72,7 @@ void render_road()
 
     int x = 0, y = 0, w = 0;
     float scale = 0;
-    project(0, 0, z, (float)cameraX - baseX, 1500, 0, &x, &y, &w, &scale);
+    project(0, 0, z, (float)cameraX - baseX, cameraHeight, 0, &x, &y, &w, &scale);
 
     seg->x = x;
     seg->y = y;
@@ -222,6 +228,14 @@ void setup()
   arduboy.setFrameRate(15);
 
   game_reset();
+
+  tunes.initChannel(PIN_SPEAKER_1);
+#ifndef AB_DEVKIT
+  // if not a DevKit
+  tunes.initChannel(PIN_SPEAKER_2);
+#else
+#endif
+  // tunes.playScore(musicScore);
 }
 
 void game_render()
@@ -356,6 +370,18 @@ void game_over()
   arduboy.display();
 }
 
+void game_title()
+{
+  Sprites::drawSelfMasked(0, 0, title, 0);
+
+  if (arduboy.pressed(A_BUTTON))
+  {
+    isGameStarted = 1;
+  }
+
+  arduboy.display();
+}
+
 // our main game loop, this runs once every cycle/frame.
 // this is where our game logic goes.
 void loop()
@@ -369,7 +395,11 @@ void loop()
   // first we clear our screen to black
   arduboy.clear();
 
-  if (!isGameOver)
+  if (!isGameStarted)
+  {
+    game_title();
+  }
+  else if (!isGameOver)
   {
     game();
   }

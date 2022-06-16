@@ -2,6 +2,8 @@
 #include "sprites.h"
 #include "track.h"
 
+#define SPRITE_SIZE_LIMIT 34
+
 extern Arduboy2 arduboy;
 
 extern int height;
@@ -139,14 +141,7 @@ void draw_object(
 
   if (type == OBJECT_BARREL)
   {
-    if (destY < 50)
-    {
-      Sprites::drawExternalMask(destX - 8, destY - 16, drumSmall, drumSmallMask, 0, 0);
-    }
-    else
-    {
-      Sprites::drawExternalMask(destX - 8, destY - 16, drum, drumMask, 0, 0);
-    }
+    Sprites::drawExternalMask(destX - 8, destY - 16, drum, drumMask, 0, 0);
   }
   else if (type == OBJECT_GAS)
   {

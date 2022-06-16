@@ -25,4 +25,6 @@ extern const uint8_t PROGMEM gasCanMask[];
 extern const uint8_t PROGMEM player[];
 extern const uint8_t PROGMEM bearLogo[];
 
+extern const uint8_t PROGMEM title[];
+
 #endif

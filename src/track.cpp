@@ -222,7 +222,10 @@ void reset_road()
 {
   segmentHead = segmentTail = 0;
 
-  add_road(0, 16, 0, 0);
+  add_road(0, 45, 0, 0);
+  for(char i = 0; i < 45; i++) {
+    get_segment(i)->objects = 0;
+  }
 
   for (char i = 0; i < MAX_SEGMENTS - TRACK_FEATURE_LENGTH; i++)
   {
