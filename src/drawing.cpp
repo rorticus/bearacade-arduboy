@@ -145,7 +145,7 @@ void draw_object(
   }
   else if (type == OBJECT_GAS)
   {
-    Sprites::drawExternalMask(destX - 3, destY - 4, gasCan, gasCanMask, 0, 0);
+    Sprites::drawExternalMask(destX - 4, destY - 9, gas, gasMask, 0, 0);
   }
   else if (type == OBJECT_BEAR)
   {

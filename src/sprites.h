@@ -19,12 +19,12 @@ extern const uint8_t PROGMEM bearMask[];
 extern const uint8_t PROGMEM bearSmall[];
 extern const uint8_t PROGMEM bearSmallMask[];
 
-extern const uint8_t PROGMEM gasCan[];
-extern const uint8_t PROGMEM gasCanMask[];
+extern const uint8_t PROGMEM gas[];
+extern const uint8_t PROGMEM gasMask[];
 
 extern const uint8_t PROGMEM player[];
-extern const uint8_t PROGMEM bearLogo[];
 
 extern const uint8_t PROGMEM title[];
+extern const uint8_t PROGMEM gameOver[];
 
 #endif

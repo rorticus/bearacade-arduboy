@@ -12,16 +12,14 @@ version 2.1 of the License, or (at your option) any later version.
 */
 
 #include <Arduboy2.h>
-#include <ArduboyPlaytune.h>
+#include <ArduboyTones.h>
 #include "drawing.h"
 #include "track.h"
 #include "sprites.h"
 
 // make an instance of arduboy used for many functions
 Arduboy2 arduboy;
-ArduboyPlaytune tunes(arduboy.audio.enabled);
-
-const byte musicScore[] PROGMEM = {0x90, 83, 0, 75, 0x80, 0x90, 88, 0, 225, 0x80, 0xf0};
+ArduboyTones sound(arduboy.audio.enabled);
 
 #define DRAW_DISTANCE 35
 #define MAX_FUEL 1000
@@ -44,6 +42,7 @@ char colission = 0;
 char colissionMask = 0;
 int score = 0;
 char isGameStarted = 0;
+char soundSkips = 0;
 
 void project(
     float x, float y, float z,
@@ -212,6 +211,7 @@ void game_reset()
   cameraX = 0;
   notDrivingTimer = 0;
   score = 0;
+  soundSkips = 0;
 }
 
 // This function runs once in your game.
@@ -228,14 +228,6 @@ void setup()
   arduboy.setFrameRate(15);
 
   game_reset();
-
-  tunes.initChannel(PIN_SPEAKER_1);
-#ifndef AB_DEVKIT
-  // if not a DevKit
-  tunes.initChannel(PIN_SPEAKER_2);
-#else
-#endif
-  // tunes.playScore(musicScore);
 }
 
 void game_render()
@@ -269,6 +261,10 @@ void game_render()
   arduboy.display();
 }
 
+const uint16_t bearSound[] PROGMEM = {
+  220,80,
+  TONES_END };
+
 void game_update()
 {
   if (colission == OBJECT_BARREL)
@@ -287,6 +283,8 @@ void game_update()
     score += 100;
     segment *seg = get_segment(COLLISION_INDEX);
     seg->objects &= colissionMask;
+    sound.tones(bearSound);
+    soundSkips = 2;
   }
 
   add_next_track();
@@ -342,6 +340,13 @@ void game_update()
         }
       }
     }
+
+    if(soundSkips == 0) {
+      sound.tone(50, 40);
+    }
+     else {
+      soundSkips--;
+     }
   }
 }
 
@@ -353,14 +358,7 @@ void game()
 
 void game_over()
 {
-  Sprites::drawSelfMasked(width - 48, height - 48, bearLogo, 0);
-
-  arduboy.setCursor(20, 10);
-  arduboy.print("GAME OVER");
-
-  arduboy.setCursor(0, 40);
-  arduboy.println("press A to");
-  arduboy.println("play again.");
+  Sprites::drawSelfMasked(0, 0, gameOver, 0);
 
   if (arduboy.pressed(A_BUTTON))
   {
