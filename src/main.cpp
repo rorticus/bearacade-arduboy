@@ -262,21 +262,38 @@ void game_render()
 }
 
 const uint16_t bearSound[] PROGMEM = {
-  220,80,
-  TONES_END };
+    220, 80,
+    440, 80,
+    TONES_END};
+const char bearSoundTicks = 4;
+
+const uint16_t gasSound[] PROGMEM = {
+    800, 80,
+    TONES_END};
+const char gasSoundTicks = 2;
+
+const uint16_t crashSound[] PROGMEM = {
+    50, 20,
+    80, 20,
+    50, 40,
+    30, 20,
+    TONES_END};
 
 void game_update()
 {
   if (colission == OBJECT_BARREL)
   {
-    // TODO: crash
     isDriving = false;
+
+    sound.tones(crashSound);
   }
   else if (colission == OBJECT_GAS)
   {
     fuel = min(MAX_FUEL, fuel + 100);
     segment *seg = get_segment(COLLISION_INDEX);
     seg->objects &= colissionMask;
+    sound.tones(gasSound);
+    soundSkips = gasSoundTicks;
   }
   else if (colission == OBJECT_BEAR)
   {
@@ -284,7 +301,7 @@ void game_update()
     segment *seg = get_segment(COLLISION_INDEX);
     seg->objects &= colissionMask;
     sound.tones(bearSound);
-    soundSkips = 2;
+    soundSkips = bearSoundTicks;
   }
 
   add_next_track();
@@ -341,12 +358,14 @@ void game_update()
       }
     }
 
-    if(soundSkips == 0) {
-      sound.tone(50, 40);
+    if (soundSkips == 0)
+    {
+      sound.tone(NOTE_C2, 40);
     }
-     else {
+    else
+    {
       soundSkips--;
-     }
+    }
   }
 }
 
