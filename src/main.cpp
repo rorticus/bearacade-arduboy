@@ -379,6 +379,14 @@ void game_over()
 {
   Sprites::drawSelfMasked(0, 0, gameOver, 0);
 
+  char str[32];
+  sprintf(str, "%d POINTS!", score);
+
+  arduboy.setCursor(2, 24);
+  arduboy.print("YOU SCORED");
+  arduboy.setCursor(2, 24 + arduboy.getCharacterHeight() + 2);
+  arduboy.print(str);
+
   if (arduboy.pressed(A_BUTTON))
   {
     game_reset();
